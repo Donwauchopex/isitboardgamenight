@@ -75,8 +75,8 @@ func index(w http.ResponseWriter, _ *http.Request) {
 	w.Write(
 		[]byte(
 			fmt.Sprintf(
-				"The next board game night is on %s at 6:45PM\n",
-				nextBoardGameNight.Format("2024-01-02"),
+				"The next board game night is on %s\n",
+				nextBoardGameNight.Format(time.RFC850),
 			),
 		),
 	)
