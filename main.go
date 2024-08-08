@@ -121,6 +121,16 @@ func updateStatus(w http.ResponseWriter, r *http.Request) {
 	}
 
 	cancelled = req.Cancelled
+
+	w.WriteHeader(http.StatusOK)
+	w.Write(
+		[]byte(
+			fmt.Sprintf(
+				"Board game night has been %s.",
+				map[bool]string{true: "cancelled", false: "resumed"}[cancelled],
+			),
+		),
+	)
 }
 
 func health(w http.ResponseWriter, _ *http.Request) {
