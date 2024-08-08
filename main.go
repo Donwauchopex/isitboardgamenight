@@ -15,9 +15,13 @@ var (
 )
 
 func init() {
-	err := godotenv.Load()
-	if err != nil {
-		panic("Error loading .env file")
+	prod := os.Getenv("RAILWAY_ENVIRONMENT_NAME") != "production"
+
+	if !prod {
+		err := godotenv.Load()
+		if err != nil {
+			panic("Error loading .env file")
+		}
 	}
 
 	v, ok := os.LookupEnv("AUTHORIZATION")
@@ -108,8 +112,15 @@ func updateBoardGameNight(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Board game night has been updated!"))
 }
 
+func health(w http.ResponseWriter, _ *http.Request) {
+	w.Header().Set("Content-Type", "text/plain")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("OK"))
+}
+
 func main() {
 	http.HandleFunc("/", index)
 	http.HandleFunc("/update", updateBoardGameNight)
+	http.HandleFunc("/health", health)
 	http.ListenAndServe(":8080", nil)
 }
