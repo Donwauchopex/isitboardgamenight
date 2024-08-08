@@ -15,7 +15,7 @@ var (
 )
 
 func init() {
-	prod := os.Getenv("RAILWAY_ENVIRONMENT_NAME") != "production"
+	prod := os.Getenv("RAILWAY_ENVIRONMENT_NAME") == "production"
 
 	if !prod {
 		err := godotenv.Load()
