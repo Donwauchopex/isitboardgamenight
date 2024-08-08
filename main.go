@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
@@ -93,7 +94,7 @@ func index(w http.ResponseWriter, _ *http.Request) {
 	)
 }
 
-func updateBoardGameNight(w http.ResponseWriter, r *http.Request) {
+func updateStatus(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/plain")
 
 	if r.Header.Get("Authorization") != auth {
@@ -107,9 +108,19 @@ func updateBoardGameNight(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Invalid request method."))
 	}
 
-	cancelled = !cancelled
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Board game night has been updated!"))
+	type request struct {
+		Cancelled bool `json:"cancelled"`
+	}
+
+	var req request
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("Invalid request body."))
+		return
+	}
+
+	cancelled = req.Cancelled
 }
 
 func health(w http.ResponseWriter, _ *http.Request) {
@@ -120,7 +131,7 @@ func health(w http.ResponseWriter, _ *http.Request) {
 
 func main() {
 	http.HandleFunc("/", index)
-	http.HandleFunc("/update", updateBoardGameNight)
+	http.HandleFunc("/update/status", updateStatus)
 	http.HandleFunc("/health", health)
 	http.ListenAndServe(":8080", nil)
 }
