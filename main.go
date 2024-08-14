@@ -13,7 +13,7 @@ import (
 var (
 	cancelled bool
 	auth      string
-	location  *time.Location
+	location  time.Location
 )
 
 func init() {
@@ -41,7 +41,7 @@ func init() {
 	if err != nil {
 		panic("Invalid location")
 	}
-	location = loc
+	location = *loc
 }
 
 func nextBoardGameNight(t time.Time) time.Time {
@@ -74,7 +74,7 @@ func index(w http.ResponseWriter, _ *http.Request) {
 		return
 	}
 
-	now := time.Now().In(location)
+	now := time.Now().In(&location)
 	nextBoardGameNight := nextBoardGameNight(now)
 
 	if now.After(nextBoardGameNight) &&
