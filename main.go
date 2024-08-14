@@ -13,6 +13,7 @@ import (
 var (
 	cancelled bool
 	auth      string
+	location  *time.Location
 )
 
 func init() {
@@ -30,6 +31,17 @@ func init() {
 		panic("AUTHORIZATION environment variable not set")
 	}
 	auth = v
+
+	v, ok = os.LookupEnv("LOCATION")
+	if !ok {
+		panic("LOCATION environment variable not set")
+	}
+
+	loc, err := time.LoadLocation(v)
+	if err != nil {
+		panic("Invalid location")
+	}
+	location = loc
 }
 
 func nextBoardGameNight(t time.Time) time.Time {
@@ -62,7 +74,7 @@ func index(w http.ResponseWriter, _ *http.Request) {
 		return
 	}
 
-	now := time.Now()
+	now := time.Now().In(location)
 	nextBoardGameNight := nextBoardGameNight(now)
 
 	if now.After(nextBoardGameNight) &&
